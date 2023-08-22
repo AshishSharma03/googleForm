@@ -38,6 +38,7 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
             <Stack>
             {data?.map((a)=>
             <FormControlLabel
+            key={a}
             label={a}
             control={
               <Checkbox/>
