@@ -1,12 +1,11 @@
 
-import { Box, Button, Checkbox, FormControl, FormControlLabel, Input, Radio, Stack, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControl,MenuItem,Select,InputLabel, FormControlLabel, Input, Radio, Stack, Typography } from '@mui/material';
 import React, { useRef } from 'react'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
-import MultiChoiceGrid from '../customTable/MultiChoiceGrid';
 import MultiChoiceTable from '../customTable/MultiChoiceTable';
 
 
-function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onFileUpload,multiline,fullWidth,Needscale,RadioTable,CheckboxTable}) {
+function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onFileUpload,multiline,fullWidth,Needscale,RadioTable,CheckboxTable,data,DropDownMenu}) {
   const fileInputRef = useRef(null);
 
   const handleFileInputChange = (event) => {
@@ -23,21 +22,30 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
             sx={{fontSize:"16px",marginBottom:"16px"}}  
            >{Title} <span style={{fontSize:"20px",color:"red"}}>*</span></Typography>
            {(NeedRadio)?
-            <FormControlLabel
-            label="Option 1"
-              control={
-                <Radio/>
-              }
-            />
+           <Stack>
+           {data?.map((a)=>
+           <FormControlLabel key={a}
+           label={a}
+           control={
+             <Radio/>
+           }
+           />
+           )}
+            
+            </Stack>
           :""}    
            {(NeedCheckBox)?
-             <FormControlLabel
-             style={{display:"flex",gap:"1px"}}
-             label="Option 2"
-             control={
-               <Checkbox/>
-              }
-              />  
+            <Stack>
+            {data?.map((a)=>
+            <FormControlLabel
+            label={a}
+            control={
+              <Checkbox/>
+            }
+            />
+            )}
+             
+             </Stack>  
               :""
             } 
           {
@@ -75,15 +83,13 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
       {(Needscale)?
             <Box sx={{display:"flex",flexDirection:{md:"row",xs:"column"},alignItems:{md:"end",sm:"start"},justifyContent:"center",gap:"0px 30px"}}>
               <Typography>Worst</Typography>
-              
-              <Box sx={{display:"flex",flexDirection:{md:"column",sm:"row"},alignItems:"center"}}>
-                <Typography>1</Typography>
+              {data?.map((a)=>
+              <Box key={a} sx={{display:"flex",flexDirection:{md:"column",sm:"row"},alignItems:"center"}}>
+                <Typography>{a}</Typography>
                 <Radio/>
               </Box>
-              <Box sx={{display:"flex",flexDirection:{md:"column",sm:"row"},alignItems:"center"}}>
-                <Typography>2</Typography>
-                <Radio/>
-              </Box>
+                )}
+           
             
               <Typography>Best</Typography>
             </Box>
@@ -102,6 +108,26 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
       </>
       :
       ""}
+
+      {(DropDownMenu)?
+        <>
+          <FormControl>
+          <InputLabel>Choose</InputLabel>
+          <Select
+          sx={{width:"200px"}}
+          label="Choose"
+        // value={selectedOption}
+        // onChange={handleOptionChange}
+      >
+        <MenuItem value="">Choose</MenuItem>
+        {
+          data?.map((a)=> <MenuItem key={a} value={a}>{a}</MenuItem>)
+        }
+        
+      </Select>
+          </FormControl>
+        </>
+      :""}
               
     </Box>
   )
@@ -117,9 +143,5 @@ const CustomCardStyle = (color,Fontolor) => {
     }
 }
 
-const FormControlLabelStyle = () => {
-  return {
 
-  }
-}
 export default CustomCard;

@@ -3,6 +3,8 @@ import React from 'react'
 import CustomCard from './Components/CustomCard'
 import HeadCard from './Components/HeadCard'
 
+const optionData = ["Option 1","Option 2","Option 4"]
+
 function Home() {
   return (
     <Box
@@ -12,14 +14,14 @@ function Home() {
       <Container maxWidth={"md"}>
         <Box component={"form"} sx={FormBody} >
           <HeadCard/>
-          <CustomCard Title={"MCQ"} NeedRadio />
-          <CustomCard Title={"Checkbox"} NeedCheckBox/>
+          <CustomCard Title={"MCQ"} NeedRadio  data={optionData}/>
+          <CustomCard Title={"Checkbox"} NeedCheckBox data={optionData}/>
           <CustomCard Title={"Short Answer"} NeedInput/>
           <CustomCard Title={"ParaGraph"} NeedInput multiline fullWidth/>
-          <CustomCard Title={"Drop down"} />
+          <CustomCard Title={"Drop down"} DropDownMenu  data={optionData}/>
           <CustomCard Title={"File Upload"} NeedFileUploader/>
-          <CustomCard Title={"Linear Scale"} Needscale />
-          <CustomCard Title={"Multi choice Grid"}  RadioTable/>
+          <CustomCard Title={"Linear Scale"} Needscale data={[1,2,3,4,5]} />
+          <CustomCard Title={"Multi choice Grid"}  RadioTable />
           <CustomCard Title={"Tick box Grid"} CheckboxTable />
           <Stack direction={"row"} alignItems={"center"}>
             <Button type="submit" variant="contained">Submit</Button>
