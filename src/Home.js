@@ -10,38 +10,64 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import CustomCard from "./Components/CustomCard";
 import HeadCard from "./Components/HeadCard";
+import { useCookies } from "react-cookie";
+import PopupLayed from "./Components/PopupLayer/Index";
+import { useNavigate } from 'react-router-dom';
 
 const optionData = ["Option 1", "Option 2", "Option 4"];
 
 function Home() {
-  const [selectedRadioOption, setSelectedRadioOption] = useState();
-  const [selectedChekedOption, setSelectedChekedOption] = useState();
-  const [shortAnsSatate,setShortAnsSatate] = useState("");
-  const [LongAnsSatate,setLongAnsSatate] = useState("");
+  const [cookies,setCookie,removeCookie] = useCookies(["state"]);
+  const navigate = useNavigate();
+
+  const [selectedRadioOption, setSelectedRadioOption] = useState(
+    cookies.state?.selectedRadioOption || ""
+  );
+  const [selectedChekedOption, setSelectedChekedOption] = useState(
+    cookies.state?.selectedChekedOption || ""
+  );
+  const [shortAnsSatate, setShortAnsSatate] = useState(
+    cookies.state?.shortAnsSatate || ""
+  );
+  const [LongAnsSatate, setLongAnsSatate] = useState(
+    cookies.state?.LongAnsSatate || ""
+  );
   const fileInputRef = useRef(null);
-  const [fileUpload,onFileUpload] = useState()
-  const [selectedOption, setSelectedOption] = useState("");
-  const [selectedScaleOption, setSelectedScaleOption] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [fileUpload, onFileUpload] = useState(
+    cookies.state?.fileUpload || ""
+  );
+  const [selectedOption, setSelectedOption] = useState(
+    cookies.state?.selectedOption || ""
+  );
+  const [selectedScaleOption, setSelectedScaleOption] = useState(
+    cookies.state?.selectedScaleOption || [
+      false,
+      false,
+      false,
+      false,
+      false,
+    ]
+  );
   const rowHeaders = ["Row 1", "Row 2", "Row 3"];
   const columnHeaders = ["Column 1", "Column 2", "Column 3"];
-  const [MultiChoiceGridRow, SetMultiChoiceGridRow] = useState({
-    "Row 1": [false, false, false],
-    "Row 2": [false, false, false],
-    "Row 3": [false, false, false],
-  });
-  const [MultiChoiceGridTickRow, SetMultiChoiceGridTickRow] = useState({
-    "Row 1": [false, false, false],
-    "Row 2": [false, false, false],
-    "Row 3": [false, false, false],
-  });
+  const [MultiChoiceGridRow, SetMultiChoiceGridRow] = useState(
+    cookies.state?.MultiChoiceGridRow || {
+      "Row 1": [false, false, false],
+      "Row 2": [false, false, false],
+      "Row 3": [false, false, false],
+    }
+  );
+  const [MultiChoiceGridTickRow, SetMultiChoiceGridTickRow] = useState(
+    cookies.state?.MultiChoiceGridTickRow || {
+      "Row 1": [false, false, false],
+      "Row 2": [false, false, false],
+      "Row 3": [false, false, false],
+    }
+  );
   const [error,setError] = useState(-1);
   const [ActiveErrors, setActiveErrors] = useState(false)
+  const [AllDataFilled, setAllDataFilled] = useState(false)
+  const [needClear , setNeedClear] = useState(false)
   const checkRowsHaveTrueValue = () => {
     for (const row in MultiChoiceGridRow) {
       if (MultiChoiceGridRow[row].every(value => value === false)) {
@@ -66,9 +92,9 @@ function Home() {
 
 
   const fromValidation = () => {
-    if( selectedRadioOption === undefined){
+    if( selectedRadioOption === ""){
         setError(1)
-      }else if(selectedChekedOption === undefined){
+      }else if(selectedChekedOption === ""){
         setError(2)
       }else if(shortAnsSatate.length === 0){
         setError(3)
@@ -76,7 +102,7 @@ function Home() {
         setError(4)
       }else if(!optionData.includes(selectedOption)){
         setError(5)
-      }else if(fileUpload === undefined){
+      }else if(fileUpload === ""){
         setError(6)
       }else if(!selectedScaleOption.includes(true)){
       setError(7) 
@@ -87,30 +113,92 @@ function Home() {
     }else{
       setError(-1)
       setActiveErrors(false)
+      setAllDataFilled(true)
     }
   };
+
+
+    const SubmittedData = () =>{
+
+      if(AllDataFilled){
+        navigate("/submitted", { replace: true });
+      }else{
+        setActiveErrors(true)
+      }
+    }
+
   
+
     useEffect(()=>{
       if(ActiveErrors){  
         fromValidation()
       }
-    },[ActiveErrors, fromValidation])
+      
+      const interval = setInterval(()=>{
+      setCookie("state", {
+        selectedRadioOption,
+        selectedChekedOption,
+        shortAnsSatate,
+        LongAnsSatate,
+        fileUpload,
+        selectedOption,
+        selectedScaleOption,
+        MultiChoiceGridRow,
+        MultiChoiceGridTickRow,
+      },)},1500);
 
+      return () => {
+        clearInterval(interval);
+      };
+    },[
+      ActiveErrors,
+      fromValidation,
+      selectedRadioOption,
+      selectedChekedOption,
+      shortAnsSatate,
+      LongAnsSatate,
+      fileUpload,
+      selectedOption,
+      selectedScaleOption,
+      MultiChoiceGridRow,
+      MultiChoiceGridTickRow,
+      error,
+      setCookie,
+    ])
+
+    const onClear = ()=>{
+     removeCookie('state')
+     setNeedClear(false)
+     window.location.reload();
+    }
+
+  
   return (
+    <>
+    {
+      (needClear)?
+      <PopupLayed
+      onTap={()=>{setNeedClear(false)}}
+      onCancel={()=>{setNeedClear(false)}}
+      onClear={onClear}
+      />
+      :""
+    }
     <Box component={"div"} style={MainBodyStyle}>
+      
       <Container maxWidth={"md"}>
         <Box component={"form"} sx={FormBody}>
           <HeadCard />
           <CustomCard
             Title={"MCQ"}
             NeedRadio
-            error={(error === 1 || error === 0)? true : false }
+            error={(error === 1) }
             selectedRadioOption={selectedRadioOption}
             setSelectedRadioOption={setSelectedRadioOption}
             data={optionData}
           />
           <CustomCard
-           error={(error === 2 || error === 0)? true : false }
+           error={(error === 2 ) }
             Title={"Checkbox"}
             NeedCheckBox
             selectedChekedOption={selectedChekedOption}
@@ -118,12 +206,12 @@ function Home() {
             data={optionData}
           />
           <CustomCard Title={"Short Answer"}
-          error={(error === 3 || error === 0)? true : false }
+          error={(error === 3 ) }
           ShortAnsSatate={shortAnsSatate}
           setShortAnsSatate={setShortAnsSatate}
           NeedInput />
           <CustomCard Title={"ParaGraph"} 
-          error={(error === 4 || error === 0)? true : false }
+          error={(error === 4 ) }
         
           LongAnsSatate={LongAnsSatate}
           setLongAnsSatate={setLongAnsSatate}
@@ -134,14 +222,14 @@ function Home() {
 
           <CustomCard
             Title={"Drop down"}
-            error={(error === 5 || error === 0)? true : false }
+            error={(error === 5 ) }
             DropDownMenu
             selectedOption={selectedOption}
             setSelectedOption={setSelectedOption}
             data={optionData}
           />
           <CustomCard
-         error={(error === 6 || error === 0)? true : false }
+         error={(error === 6 ) }
             Title={"File Upload"}
             fileUpload={fileUpload}
             onFileUpload={onFileUpload}
@@ -151,7 +239,7 @@ function Home() {
           <CustomCard
             Title={"Linear Scale"}
             Needscale
-            error={(error === 7 || error === 0)? true : false }
+            error={(error === 7 ) }
             selectedScaleOption={selectedScaleOption}
             setSelectedScaleOption={setSelectedScaleOption}
             data={[1, 2, 3, 4, 5]}
@@ -159,7 +247,7 @@ function Home() {
           <CustomCard
             Title={"Multi choice Grid"}
             RadioTable
-            error={(error === 8 || error === 0)? true : false }
+            error={(error === 8 ) }
             rowHeaders={rowHeaders}
             columnHeaders={columnHeaders}
             MultiChoiceGridRow={MultiChoiceGridRow}
@@ -168,7 +256,7 @@ function Home() {
           <CustomCard
             Title={"Tick box Grid"}
             CheckboxTable
-            error={(error === 9 || error === 0)? true : false }
+            error={(error === 9 ) }
             rowHeaders={rowHeaders}
             columnHeaders={columnHeaders}
             MultiChoiceGridTickRow={MultiChoiceGridTickRow}
@@ -198,7 +286,7 @@ function Home() {
               // type="submit"
               variant="contained"
               sx={{ boxShadow: "none" }}
-              onClick={()=>{setActiveErrors(true)}}
+              onClick={SubmittedData}
             >
               Submit
             </Button>
@@ -221,7 +309,10 @@ function Home() {
               </Typography>
             </Stack>
             <span style={{ flex: 1 }} />
-            <Button>Clear form</Button>
+            <Button
+            onClick={()=> setNeedClear(true)}
+    
+            >Clear form</Button>
           </Stack>
           <Box>
             <Typography sx={FooterTypo}>
@@ -251,6 +342,7 @@ function Home() {
         </Box>
       </Container>
     </Box>
+    </>
   );
 }
 

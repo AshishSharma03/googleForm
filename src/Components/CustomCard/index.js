@@ -14,8 +14,7 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
  ,setSelectedScaleOption,setSelectedOption,fileInputRef,selectedOption,SetMultiChoiceGridTickRow,
  setShortAnsSatate,setLongAnsSatate,LongAnsSatate,ShortAnsSatate
 }) {
- 
-
+  
 
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
@@ -45,7 +44,12 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
   return (
     <Box
      component={"div"} 
-     sx={CustomCardStyle()}>
+     sx={{
+      background  :"#fff",
+        padding:"24px",
+        borderRadius :"8px",
+        border:(error)? "1px solid red" : "1px solid #dadce0",
+     }}>
           <Typography
             sx={{fontSize:"16px",marginBottom:"16px"}}  
            >{Title} <span style={{fontSize:"20px",color:"red"}}>*</span></Typography>
@@ -200,16 +204,5 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
     </Box>
   )
 }
-
-const CustomCardStyle = (color,Fontolor) => {
-    return {
-        background  :"#fff",
-        padding:"24px",
-        borderRadius :"8px",
-        border: "1px solid #dadce0",
-
-    }
-}
-
 
 export default CustomCard;
