@@ -6,14 +6,36 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
 } from '@mui/material';
 import MultiChoiceGrid from './MultiChoiceGrid'; 
 import MultiChoiceGridTick from './MultiChoiceGirdTick';
 
-const MultiChoiceTable = ({ tick, radio }) => {
-  const rowHeaders = ['Row 1', 'Row 2', 'Row 3'];
-  const columnHeaders = ['Column 1', 'Column 2', 'Column 3'];
+const MultiChoiceTable = ({radio,rowHeaders ,columnHeaders,MultiChoiceGridRow,SetMultiChoiceGridRow,MultiChoiceGridTickRow,SetMultiChoiceGridTickRow}) => {
+
+const handleRadio = (colIndex, rowIndex) => {
+  SetMultiChoiceGridRow((prevRows) => {
+    const newRow = [...prevRows[rowHeaders[rowIndex]]];
+    newRow.fill(false); 
+    newRow[colIndex] = true; 
+
+    return {
+      ...prevRows,
+      [rowHeaders[rowIndex]]: newRow,
+    };
+  });
+};
+
+const handleTick = (colIndex, rowIndex) => {
+  SetMultiChoiceGridTickRow((prevRows) => {
+    const newRow = [...prevRows[rowHeaders[rowIndex]]];
+    newRow[colIndex] = !newRow[colIndex];
+
+    return {
+      ...prevRows,
+      [rowHeaders[rowIndex]]: newRow,
+    };
+  });
+};
 
   return (
     <TableContainer
@@ -38,7 +60,7 @@ const MultiChoiceTable = ({ tick, radio }) => {
         >
           <TableRow>
             <TableCell sx={{ border: 'none' }} />
-            {columnHeaders.map((header) => (
+            {columnHeaders?.map((header) => (
               <TableCell
                 key={header}
                 align="center"
@@ -50,7 +72,7 @@ const MultiChoiceTable = ({ tick, radio }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rowHeaders.map((rowHeader, rowIndex) => (
+          {rowHeaders?.map((rowHeader, rowIndex) => (
             <TableRow
               key={rowHeader}
               sx={{
@@ -61,9 +83,15 @@ const MultiChoiceTable = ({ tick, radio }) => {
               <TableCell component="th" scope="row" sx={{ border: 'none' }}>
                 {rowHeader}
               </TableCell>
-              {[0, 1, 2].map((colIndex) => (
+              {columnHeaders?.map((colIndex,colIndexKey) => (
                 <TableCell key={colIndex}>
-                  {radio ? <MultiChoiceGrid /> : <MultiChoiceGridTick />}
+                  {radio ? <MultiChoiceGrid  
+                         checked={MultiChoiceGridRow[rowHeaders[rowIndex]][colIndexKey]}
+                        onChange={()=> handleRadio(colIndexKey,rowIndex) }
+                  /> : <MultiChoiceGridTick
+                  checked={MultiChoiceGridTickRow[rowHeaders[rowIndex]][colIndexKey]}
+                  onChange={() => handleTick(colIndexKey,rowIndex)}
+                  />}
                 </TableCell>
               ))}
             </TableRow>

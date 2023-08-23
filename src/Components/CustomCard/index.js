@@ -1,12 +1,21 @@
 
-import { Box, Button, Checkbox, FormControl,MenuItem,Select,InputLabel, FormControlLabel, Input, Radio, Stack, Typography } from '@mui/material';
-import React, { useRef } from 'react'
+import { Box, Button, Checkbox, FormControl,MenuItem,Select,InputLabel, FormControlLabel, Input, Radio, Stack, Typography, IconButton } from '@mui/material';
+import React from 'react'
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import MultiChoiceTable from '../customTable/MultiChoiceTable';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+import ImageIcon from '@mui/icons-material/Image';
+function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onFileUpload,fileUpload,multiline,
+  fullWidth,Needscale,RadioTable,CheckboxTable,data,DropDownMenu,error
+ , rowHeaders,columnHeaders,MultiChoiceGridRow,SetMultiChoiceGridRow,
+ MultiChoiceGridTickRow,selectedRadioOption,selectedChekedOption
+ ,setSelectedRadioOption,setSelectedChekedOption,selectedScaleOption
+ ,setSelectedScaleOption,setSelectedOption,fileInputRef,selectedOption,SetMultiChoiceGridTickRow,
+ setShortAnsSatate,setLongAnsSatate,LongAnsSatate,ShortAnsSatate
+}) {
+ 
 
-
-function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onFileUpload,multiline,fullWidth,Needscale,RadioTable,CheckboxTable,data,DropDownMenu}) {
-  const fileInputRef = useRef(null);
 
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
@@ -14,6 +23,25 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
       onFileUpload(file);
     }
   };
+
+  const handleRadioChange = (event) => {
+    setSelectedRadioOption(event.target.value);
+  };
+
+  const handleCheckboxChange = (event) => {
+    setSelectedChekedOption(event.target.value);
+  };
+
+  const handleScaleChange = (index) => {
+    const updatedOptions = selectedScaleOption?.map((value, i) => i === index);
+    setSelectedScaleOption(updatedOptions);
+  };
+
+  const  handleOptionChange= (event) => {
+    setSelectedOption(event.target.value);
+  };
+
+
   return (
     <Box
      component={"div"} 
@@ -27,7 +55,11 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
            <FormControlLabel key={a}
            label={a}
            control={
-             <Radio/>
+             <Radio
+             checked={selectedRadioOption === a}
+             onChange={handleRadioChange}
+             value={a}
+             />
            }
            />
            )}
@@ -41,7 +73,11 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
             key={a}
             label={a}
             control={
-              <Checkbox/>
+              <Checkbox
+              checked={selectedChekedOption === a}
+             onChange={handleCheckboxChange}
+             value={a}
+              />
             }
             />
             )}
@@ -52,6 +88,8 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
           {
             (NeedInput)?
             <Input
+            value={(multiline)?LongAnsSatate:ShortAnsSatate}
+            onChange={(e)=>{ (multiline)?setLongAnsSatate(e.target.value) :setShortAnsSatate(e.target.value)}}
             multiline={multiline}
             placeholder='Your Answer'
             fullWidth={fullWidth}
@@ -60,7 +98,7 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
           }
 
           {(NeedFileUploader)?
-          <>
+           (!fileUpload)?<>
               <input
               ref={fileInputRef}
               type="file"
@@ -77,17 +115,28 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
               <FileUploadOutlinedIcon sx={{fontSize:"18px"}}/>
               <Typography sx={{fontSize:"16x"}}>Add File</Typography> 
             </Button>
-            </>
+            </> :
+              <Box sx={{display:"flex",alignItems:"center",gap:"3px",padding:"10px 10px",border:"1px solid #dadce0",borderRadius:"6px",width:"fit-content",cursor: "pointer",}}>
+                <ImageIcon sx={{color:"red"}}/>
+               <Typography sx={{textDecoration:"underline"}}>{fileUpload.name}</Typography> 
+              <IconButton size="small" onClick={()=>{onFileUpload()}}>
+                 <CloseIcon/>
+              </IconButton>
+              </Box>
             :""
           }
 
       {(Needscale)?
             <Box sx={{display:"flex",flexDirection:{md:"row",xs:"column"},alignItems:{md:"end",sm:"start"},justifyContent:"center",gap:"0px 30px"}}>
               <Typography>Worst</Typography>
-              {data?.map((a)=>
+              {data?.map((a,index)=>
               <Box key={a} sx={{display:"flex",flexDirection:{md:"column",sm:"row"},alignItems:"center"}}>
                 <Typography>{a}</Typography>
-                <Radio/>
+                <Radio
+                 checked={selectedScaleOption[index]}
+                 onChange={()=> handleScaleChange(index)}
+                 value={a}
+                />
               </Box>
                 )}
            
@@ -98,14 +147,24 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
 
       {(RadioTable)?
       <>
-        <MultiChoiceTable radio/>
+        <MultiChoiceTable radio
+     rowHeaders={rowHeaders}
+     columnHeaders={columnHeaders}
+     MultiChoiceGridRow={MultiChoiceGridRow}
+     SetMultiChoiceGridRow={SetMultiChoiceGridRow}
+         />
       </>
       :
       ""}
 
     {(CheckboxTable)?
       <>
-        <MultiChoiceTable/>
+        <MultiChoiceTable
+        rowHeaders={rowHeaders}
+        columnHeaders={columnHeaders}
+        MultiChoiceGridTickRow={MultiChoiceGridTickRow}
+        SetMultiChoiceGridTickRow={SetMultiChoiceGridTickRow}
+        />
       </>
       :
       ""}
@@ -117,8 +176,8 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
           <Select
           sx={{width:"200px"}}
           label="Choose"
-        // value={selectedOption}
-        // onChange={handleOptionChange}
+        value={selectedOption}
+        onChange={handleOptionChange}
       >
         <MenuItem value="">Choose</MenuItem>
         {
@@ -129,7 +188,15 @@ function CustomCard({NeedCheckBox,NeedRadio,NeedInput,NeedFileUploader,Title,onF
           </FormControl>
         </>
       :""}
-              
+
+       {(error)?
+      <Box sx={{display:"flex" , alignItems:"center",gap:"8px",marginTop:"8px"}} >
+
+          <ErrorOutlineOutlinedIcon sx={{color:"#D93025"}}/>
+          <Typography sx={{fontSize:"12px",color:"#D93025"}}> {(CheckboxTable || RadioTable )?"This question requires at least one response per row":"This is a required question"}</Typography> 
+      </Box>
+        :""
+       }
     </Box>
   )
 }

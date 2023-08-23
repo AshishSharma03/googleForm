@@ -1,12 +1,15 @@
 // MultiChoiceGrid.js
 import React from 'react';
-import { Checkbox,Box, FormControlLabel, FormGroup, Radio } from '@mui/material';
+import { Box, FormGroup, Radio } from '@mui/material';
 
-const MultiChoiceGrid = () => {
+const MultiChoiceGrid = ({onChange,checked}) => {
   return (
     <FormGroup>
       <Box sx={{textAlign:"center"}}>
-     <Radio/>
+     <Radio
+     checked={checked}
+     onChange={onChange}
+     />
       </Box>
     </FormGroup>
   );
